@@ -229,4 +229,22 @@ status_nf enum('N','C','D'),#N=Normal, C=Cancelada, D=Devolvida
 id_user varchar(50)
 );
 
+#criando FK na tab nota_fiscal ref tab pedidos
+alter table nota_fiscal
+add constraint fk_nota_fiscal_pedidos foreign key(num_ped_ref)
+references pedidos(num_pedido);
 
+#criando FK na tab nota_fiscal ref tab clientes
+alter table nota_fiscal
+add constraint fk_nota_fiscal_clientes foreign key(id_cliente)
+references clientes(id_cliente);
+
+#criando FK na tab nota_fiscal ref cliente_endereco
+alter table nota_fiscal
+add constraint fk_nota_fiscal_cli_end foreign key(id_endereco)
+references cliente_endereco(id_endereco);
+
+#criando FK na tab nota_fiscal ref tab cond_pagto_det
+alter table nota_fiscal
+add constraint fk_nota_fiscal_cond_pagto_det foreign key(id_pagto)
+references cond_pagto_det(id_pagto);
