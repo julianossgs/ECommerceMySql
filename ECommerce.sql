@@ -248,3 +248,14 @@ references cliente_endereco(id_endereco);
 alter table nota_fiscal
 add constraint fk_nota_fiscal_cond_pagto_det foreign key(id_pagto)
 references cond_pagto_det(id_pagto);
+
+#criando tabela nf_itens
+create table nf_itens(
+num_nota int not null,
+id_produto int not null,
+qtd int not null,
+val_unit decimal(10,2) not null,
+desconto decimal(10,2) not null,
+total decimal(10,2) not null
+
+);
