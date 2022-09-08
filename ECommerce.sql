@@ -259,3 +259,13 @@ desconto decimal(10,2) not null,
 total decimal(10,2) not null
 
 );
+
+#criando FK na tab nf_itens ref tab nota_fiscal
+alter table nf_itens
+add constraint fk_nf_itens_nota_fiscal foreign key(num_nota)
+references nota_fiscal(num_nota);
+
+#criando FK na tab nf_itens ref tab produto
+alter table nf_itens
+add constraint fk_nf_itens_produto foreign key(id_produto)
+references produto(id_produto);
