@@ -181,3 +181,25 @@ references cliente_endereco(id_endereco);
 alter table pedidos
 add constraint fk_pedido_cond_pagto foreign key(id_pagto)
 references cond_pagto(id_pagto);
+
+#criando tabela pedido_itens
+create table pedido_itens(
+num_pedido int not null,
+id_produto int not null,
+qtd int not null,
+val_unit decimal(10,2),
+desconto decimal(10,2),
+total decimal(10,2)
+);
+
+#criando FK na tab pedido_itens ref tab pedidos
+alter table pedido_itens
+add constraint fk_pedido_itens_pedido foreign key(num_pedido)
+references pedidos(num_pedido);
+
+#criando FK na tab pedido_itens ref tab produto
+alter table pedido_itens
+add constraint fk_pedido_itens_produto foreign key(id_produto)
+references produto(id_produto);
+
+
