@@ -202,4 +202,13 @@ alter table pedido_itens
 add constraint fk_pedido_itens_produto foreign key(id_produto)
 references produto(id_produto);
 
+#criando tabela pedido_obs
+create table pedido_obs(
+num_pedido int not null,
+obs varchar(255) not null
+);
 
+#criando FK na tab pedido_obs ref tab pedidos
+alter table pedido_obs
+add constraint fk_pedido_obs_pedidos foreign key(num_pedido)
+references pedidos(num_pedido);
