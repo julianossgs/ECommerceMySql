@@ -166,3 +166,18 @@ efetiva_entrega date,
 status_ped enum('A','S','F','T','E')
 #A=aguard aprov , S=Separacao , F=Faturado , T=Transito, E=entregue
 );
+
+#criando FK na tab pedidos ref tab clientes
+alter table pedidos
+add constraint fk_pedido_cliente foreign key(id_cliente)
+references clientes(id_cliente);
+
+#criando FK na tab pedidos ref tab cliente_endereco
+alter table pedidos
+add constraint fk_pedido_cliente_end foreign key(id_endereco)
+references cliente_endereco(id_endereco);
+
+#criando FK na tab pedidos ref tab cond_pagto
+alter table pedidos
+add constraint fk_pedido_cond_pagto foreign key(id_pagto)
+references cond_pagto(id_pagto);
