@@ -269,3 +269,31 @@ references nota_fiscal(num_nota);
 alter table nf_itens
 add constraint fk_nf_itens_produto foreign key(id_produto)
 references produto(id_produto);
+
+#criando tabela nf_obs
+create table nf_obs(
+num_nota int not null,
+obs varchar(255) not null
+
+);
+
+#criando FK na tab nf_obs ref tab nota_fiscal
+alter table nf_obs
+add constraint fk_nf_obs_nota_fiscal foreign key(num_nota)
+references nota_fiscal(num_nota);
+
+#criando tabela carrinho_compras
+create table carrinho_compras(
+sessao varchar(32) not null,
+id_produto int not null,
+qtd int not null,
+val_unit decimal(10,2) not null,
+desconto decimal(10,2) not null,
+total decimal(10,2) not null,
+data_hora_sessa datetime not null
+);
+
+#criando FK na tab carrinho_compras ref tab produtos
+alter table carrinho_compras
+add constraint fk_carrinho_produto foreign key(id_produto)
+references produto(id_produto);
