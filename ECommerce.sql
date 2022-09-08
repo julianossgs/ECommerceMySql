@@ -297,3 +297,22 @@ data_hora_sessa datetime not null
 alter table carrinho_compras
 add constraint fk_carrinho_produto foreign key(id_produto)
 references produto(id_produto);
+
+#criando index na tabela carrinho_compras
+create index ix_cc_1 on carrinho_compras(sessao);
+
+#criando tabela rastreabilidade
+create table rastreabilidade(
+num_pedido int not null,
+status_ped char(1) not null,
+#A=aguard aprov , S=Separacao , F=faturado , T=em transito , E=entregue
+data_hora datetime not null,
+id_user varchar(50)
+);
+
+#criando FK na tab rastreabilidade ref tab pedidos
+alter table rastreabilidade
+add constraint fk_rast_pedidos foreign key(num_pedido)
+references pedidos(num_pedido);
+
+
