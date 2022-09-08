@@ -212,3 +212,21 @@ obs varchar(255) not null
 alter table pedido_obs
 add constraint fk_pedido_obs_pedidos foreign key(num_pedido)
 references pedidos(num_pedido);
+
+#criando tabela nota_fiscal
+create table nota_fiscal(
+num_nota int not null primary key auto_increment,
+num_ped_ref int not null,
+id_cliente int not null,
+id_endereco int not null,
+id_pagto int not null,
+total_prod decimal(10,2),
+total_frete decimal(10,2),
+total_desc decimal(10,2),
+total_nf decimal(10,2),
+data_nf datetime not null,
+status_nf enum('N','C','D'),#N=Normal, C=Cancelada, D=Devolvida
+id_user varchar(50)
+);
+
+
