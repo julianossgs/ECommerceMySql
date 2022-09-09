@@ -444,3 +444,64 @@ select a.nome_mun,
  end//
  delimiter ;
  
+ 
+ #Procedure p/ inserir itens no carrinho
+ delimiter //
+ create procedure proc_carga_carrinho(v_sessao varchar(32),
+									  v_id_prod int,
+                                      v_qtd int,
+                                      out resposta varchar(50))
+  main: begin
+        declare v_qtd_livre int;
+        declare v_preco_venda decimal(10,2);
+        declare cod_erro char(5) default '00000';
+        declare msg TEXT;
+        declare rows int;
+        declare continue handler for sqlexception
+        BEGIN
+        get diagnostics condition 1
+        cod_erro = returned_sqlstate,msg = message_text;
+        end;
+        
+        #lendo qtd no estoque e atribuindo a variável
+        select estoque_Livre into v_qtd_livre from estoque
+        where id_produto = v_id_prod;
+        
+        select v_qtd_livre
+        #verificando se existe saldo diponivel
+        if v_qtd > v_qtd_livre then
+        set resposta = 'Quantidade indisponivel';
+        leave main;
+        end if;
+        
+        #pegando preço de venda
+        select preco_venda into v_preco_venda from produto
+        where id_produto = v_id_prod;
+        #carga no carrinho de compras
+        #inicia transação
+        start transaction;
+        #carregando carrinhos
+        insert into carrinho_compras values
+        (md5(v_sessao),v_id_prod,v_qtd,v_preco_venda,0,v_qtd * v_preco_venda,now());
+        
+        #atualizando disponibilidade estoque
+        update estoque set estoque_livre = estoque_livre - v_qtd,
+						   estoque_reservado = estoque_reservado + v_qtd
+                           where id_produto = v_id_prod;
+                           
+        #checando excessao com if
+        if cod_erro = '00000' then
+        get diagnostics rows = ROW_COUNT;
+        set resposta = concat('Atualizacao com sucesso = ',rows);
+        commit;
+        
+        else
+        set resposta = concat('Erro na atualizacao,error = ',cod_erro,
+        ', message = ',msg);
+        rollback;
+        end if;
+        end//
+        
+ 
+ delimiter ;
+ 
