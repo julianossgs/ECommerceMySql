@@ -315,4 +315,111 @@ alter table rastreabilidade
 add constraint fk_rast_pedidos foreign key(num_pedido)
 references pedidos(num_pedido);
 
+#Carga das tabelas
+insert into categorias (descricao)
+values('JOGOS'),('ELETRÔNICOS'),('SOM'),('ELETRODOMÉSTICOS');
 
+select * from categorias;
+
+insert into fabricantes(nome_fabricante)
+values('FABR JOGOS'),('FABR ELETR.'),('FABR. SOM'),('FABR ELE.DOMES');
+
+select * from fabricantes;
+
+#carga unidade federal
+insert into unidade_federal(cod_uf,uf,nome_uf)
+select * from curso.uf;
+
+select * from unidade_federal;
+
+#carga tabela cidades
+insert into cidades(nome_cidade,cod_mun,cod_uf)
+select a.nome_mun,
+       a.cod_mun,
+       a.cod_uf
+       from curso.senso a
+       where ano = '2014';
+       
+ #carga tabela clientes
+ insert into clientes(nome,sobrenome,email,senha,data_nasc,data_cadastro,
+ ult_acesso,ult_compra,situacao)
+ values('Maria','Santos','maria@gmail.com',md5(1234),'1990-02-08',
+ now(),now(),now(),'A');
+ 
+ insert into clientes(nome,sobrenome,email,senha,data_nasc,data_cadastro,
+ ult_acesso,ult_compra,situacao)
+ values('João','Lima','joao@gmail.com',md5(4321),'1991-09-08',
+ now(),now(),now(),'A');
+ 
+ select * from clientes;
+ 
+ #carga tabela cliente_endereco
+ insert into cliente_endereco(id_cliente,tipo,endereco,numero,bairro,cep,id_cidade)
+ values(1,'P','Rua A','123','Da luz','00000000','49'),
+       (2,'P','Rua B','321','Barreiro','00000000','50');
+       
+ select * from cliente_endereco;    
+ 
+ #carga tabela cond_pagto
+ insert into cond_pagto(descricao,tipo) values('A vista','B');
+ insert into cond_pagto(descricao,tipo) values('A vista','D');
+ insert into cond_pagto(descricao,tipo) values('10 x','C');
+ insert into cond_pagto(descricao,tipo) values('5 x','C');
+ insert into cond_pagto(descricao,tipo) values('3 x','C');
+ 
+ describe cond_pagto;
+ select * from cond_pagto;
+ 
+ #carga tabela cond_pagto_det
+ insert into cond_pagto_det values(1,1,100,1);
+ 
+ insert into cond_pagto_det values(2,1,100,1);
+ 
+ insert into cond_pagto_det values(3,1,10,30);
+ insert into cond_pagto_det values(3,2,10,60);
+ insert into cond_pagto_det values(3,3,10,90);
+ insert into cond_pagto_det values(3,4,10,120);
+ insert into cond_pagto_det values(3,5,10,150);
+ insert into cond_pagto_det values(3,6,10,180);
+ insert into cond_pagto_det values(3,7,10,210);
+ insert into cond_pagto_det values(3,8,10,240);
+ insert into cond_pagto_det values(3,9,10,270);
+ insert into cond_pagto_det values(3,10,10,300);
+ 
+ insert into cond_pagto_det values(4,1,20,30);
+ insert into cond_pagto_det values(4,2,20,60);
+ insert into cond_pagto_det values(4,3,20,90);
+ insert into cond_pagto_det values(4,4,20,120);
+ insert into cond_pagto_det values(4,5,20,150);
+ 
+ insert into cond_pagto_det values(5,1,33.33,30);
+ insert into cond_pagto_det values(5,2,33.33,60);
+ insert into cond_pagto_det values(5,3,33.34,90);
+ 
+ select * from cond_pagto_det;
+ 
+ #carga tabela produto
+ insert into produto(descricao,id_categoria,id_fabricante,preco_custo,preco_venda)
+ values
+ ('Jogo Infantil',1,1,50,200),
+ ('Jogo Acao',1,1,50,200),
+ ('Jogo Estratégia',1,1,50,200),
+ ('Smart TV 42',2,2,1300,2000),
+ ('Notbook 15',2,2,2200,3000),
+ ('SmartPhone',2,2,550,1200),
+ ('Caixa de som BOOM',3,3,750,1500),
+ ('Som Automotivo',3,3,250,500),
+ ('Sound MIX',3,3,750,1200),
+ ('Geladeira',4,4,780,1580),
+ ('Batedeira',4,4,200,450),
+ ('Aspirador de Pó',4,4,200,4500);
+ 
+ select * from produto;
+ 
+ #carga tabela estoque
+ insert into estoque(id_produto,estoque_total,estoque_livre,estoque_reservado)
+ values('1','100','100','0'),('2','100','100','0'),('3','100','100','0'),
+       ('4','100','100','0'),('5','100','100','0'),('6','100','100','0'),
+       ('7','100','100','0'),('8','100','100','0'),('9','100','100','0'),
+       ('10','100','100','0'),('11','100','100','0'),('12','100','100','0');
+ 
