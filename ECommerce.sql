@@ -422,4 +422,25 @@ select a.nome_mun,
        ('4','100','100','0'),('5','100','100','0'),('6','100','100','0'),
        ('7','100','100','0'),('8','100','100','0'),('9','100','100','0'),
        ('10','100','100','0'),('11','100','100','0'),('12','100','100','0');
+       
+ 
+ #Trigger que atualiza o status do pedido na tabela rastreabilidade
+ delimiter //
+ create trigger Tgr_insert_status_ped after insert
+ on pedidos
+ for each row
+ begin
+ insert into rastreabilidade values(new.num_pedido,new.status_ped,now(),user());
+ end//
+ delimiter ;
+ 
+ #Trigger
+ delimiter //
+ create trigger Tgr_update_status_ped after update
+ on pedidos
+ for each row
+ begin
+ insert into rastreabilidade values(new.num_pedido,new.status_ped,now(),user());
+ end//
+ delimiter ;
  
