@@ -505,3 +505,73 @@ select a.nome_mun,
  
  delimiter ;
  
+ #Procedure p/ fechar carrinho de compras
+ delimiter //
+ create procedure proc_fechar_carrinho(v_sessao varchar(32),
+                                       v_id_cliente int,
+                                       v_id_pagto int,
+                                       v_frete decimal(10,2),
+                                       v_ender char(1), #P=principal A=alternativo
+                                       out resposta varchar(255))
+ main: begin
+	   declare v_total_ped decimal(10,2);
+       declare v_total_desc decimal(10,2);
+       declare v_num_ped int;
+       declare v_id_endereco int;
+       declare cod_erro char(5) default '00000';
+       declare msg TEXT;
+       declare rows int;
+       declare continue handler for sqlexception
+       BEGIN
+       get diagnostics condition 1
+       cod_erro = returned_sqlstate,msg = MESSAGE_TEXT;
+       end;
+       
+       #Pegando total carrinho e atribuindo a variável
+       select sum(total)as tot,sum(desconto) as descto into v_total_ped,v_total_desc
+       from carrinho_compras
+       where sessao = MD5(v_sessao);
+       
+       #pegando preço de venda
+       select id_endereco into v_id_endereco from cliente_endereco
+       where id_cliente = v_id_cliente limit 1;
+       
+       #iniciando transação
+       start transaction;
+       
+       insert into pedidos
+       (id_cliente,id_endereco,id_pagto,total_prod,total_frete,total_desc,
+        total_pedido,data_pedido,status_ped)
+        values(v_id_cliente,v_id_endereco,v_id_pagto,v_total_ped,v_frete,
+        v_total_desc,((v_total_ped + v_frete)- v_total_desc),now(),'A');
+        
+        
+       #pegando id do pedido
+       set v_num_ped = last_insert_id();
+       
+       #inserindo pedido itens
+       insert into pedido_itens
+       (num_pedido,id_produto,qtd,val_unit,desconto,total)
+       select v_num_ped,id_produto,qtd,val_unit,desconto,total
+       from carrinho_compras
+       where sessao = md5(v_sessao);
+       
+       #eliminando itens do carrinho
+       delete from carrinho_compras
+       where sessao = md5(v_sessao);
+       
+       #checando excessão co  IF
+       
+       if cod_erro = '00000' then
+          get diagnostics rows = ROW_COUNT;
+          set resposta = concat('Atualizacao com sucesso =  ',rows);
+          commit;
+	   else
+          set resposta = concat('Erro na atualização,error = ',rows,cod_erro,
+          ', message = ',msg);
+          rollback;
+       end if;   
+                                    
+ end//
+ delimiter ;
+ 
