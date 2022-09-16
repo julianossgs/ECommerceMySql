@@ -575,3 +575,83 @@ select a.nome_mun,
  end//
  delimiter ;
  
+ 
+ #Procedure Fatura de Pedido
+ delimiter //
+ create procedure proc_fat_pedido(v_num_ped int,
+								  out resposta varchar(255))
+  main:begin
+       declare cod_erro char(5) default '00000';
+       declare msg TEXT;
+       declare v_num_nf int;
+       declare v_qtd int;
+       declare v_id_prod int;
+       declare rows int;
+       declare exit handler for sqlexception
+       BEGIN
+       get diagnostics condition 1 @sqlstate = RETURNED_SQLSTATE,
+       @nroerro = MYSQL_ERRNO, @msgerro = MESSAGE_TEXT;
+       set @msg_erro_completa = concat("ERRO: ",@nroerro, " (", @sqlstate, "): ", @msgerro);
+       select @msg_erro_completa;
+       END;
+       
+       if(select count(*) from pedidos where num_pedido = v_num_ped and
+          status_ped in ('F','T','E')) > 0 then
+          set resposta = 'Pedido já faturado';
+          leave main;
+          end if;
+          
+          #inicia a transação
+          start transaction;
+          #lendo pedido e inserindo nfe
+          insert into nota_fiscal(num_ped_ref,id_cliente,id_endereco,id_pagto,
+          total_prod,total_frete,total_desc,total_nf,data_nf,status_nf,id_user)
+          select num_pedido,id_cliente,id_endereco,id_pagto,total_prod,total_frete,
+				 total_desc,total_pedido,now(),'N',user()
+          from pedidos
+          where num_pedido = v_num_ped;
+          
+          #pegando numero da nfe
+          set v_num_nf = last_insert_id();
+          
+          #lendo pedido itens e inserindo nota itens
+          insert into nf_itens
+          (num_nota,id_produto,qtd,val_unit,desconto,total)
+          select v_num_nf,id_produto,qtd,val_unit,desconto,total
+          from pedido_itens
+          where num_pedido = v_num_ped;
+          
+          #Atualizando status ped
+          update pedidos set status_ped = 'F'
+          where num_pedido = v_num_ped;
+          
+          #Atualizando estoque
+          update estoque inner join
+          pedido_itens on estoque.id_produto = pedido_itens.id_produto
+          set
+          estoque.estoque_total = estoque.estoque_total - pedido_itens,qtd,
+          estoque.estoque_reservado = estoque.estoque_reservado - pedido_itens.qtd
+          where
+          pedido_itens.num_pedido = v_num_ped;
+          
+          #checando excessao com IF
+          
+          if cod_erro = '00000' then
+          get diagnostics rows = ROW_COUNT;
+          set resposta = concat('Atualizacao com Sucesso = ',rows);
+          commit;
+          else
+          set resposta = concat('Erro na atualizacao,error = '.rows,cod_erro,',
+           message = ',msg);
+           rollback;
+           end if;
+           
+           select concat('resposta ',resposta)
+           union all
+           select concat('cod_erro ',cod_erro);
+           END//
+          
+          
+                                  
+  delimiter ;                                
+ 
